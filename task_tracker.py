@@ -3,73 +3,111 @@ def main():
 
     print("--- Task Duration Tracker ---")
     print("Enter tasks and their duration in minutes.")
-    print("Press Enter on an empty task name when finished.\n")
 
     while True:
-        # Prompt for task name
-        task_name = input("Enter task name: ").strip()
+        # Display main option menu
+        print("\nOptions:")
+        print("  1. Add or update a task")
+        print("  2. Remove a recorded task")
+        print("  3. Finish and view summary")
+        
+        choice = input("Choose an option (1-3): ").strip()
 
-        # Blank task name ends entry
-        if not task_name:
+        # Option 3: Finish task entry
+        if choice == "3":
             break
 
-        # Check for duplicate task name
-        existing_task = next((t for t in tasks if t["name"].lower() == task_name.lower()), None)
-        action = None
-        if existing_task:
-            print(f" Task '{existing_task['name']}' already exists (Current duration: {existing_task['duration']} min).")
-            while True:
-                choice = input(" Choose action - [a]dd time, [o]verwrite duration, or [c]ancel: ").strip().lower()
-                if choice in ['a', 'add']:
-                    action = 'add'
-                    break
-                elif choice in ['o', 'overwrite']:
-                    action = 'overwrite'
-                    break
-                elif choice in ['c', 'cancel']:
-                    action = 'cancel'
-                    break
+        # Option 2: Remove a recorded task
+        elif choice == "2":
+            if not tasks:
+                print(" No tasks recorded yet to remove.")
+                continue
+
+            print("\nCurrent Tasks:")
+            for idx, task in enumerate(tasks, start=1):
+                print(f"  {idx}. {task['name']} ({task['duration']} min)")
+
+            remove_input = input("Enter the task number to remove (or press Enter to cancel): ").strip()
+            if not remove_input:
+                print(" Selection cancelled.")
+                continue
+
+            if remove_input.isdigit():
+                remove_idx = int(remove_input) - 1
+                if 0 <= remove_idx < len(tasks):
+                    removed_task = tasks.pop(remove_idx)
+                    print(f" Removed '{removed_task['name']}' ({removed_task['duration']} min).")
                 else:
-                    print("  Invalid choice. Please enter 'a' to add, 'o' to overwrite, or 'c' to cancel.")
-            
-            if action == 'cancel':
-                print(" Entry cancelled.\n")
-                continue
-
-        # Prompt for positive whole-number minutes with validation
-        while True:
-            duration_input = input(f"Enter duration for '{task_name}' (in minutes): ").strip()
-
-            # 1. Reject blank / empty input
-            if not duration_input:
-                print(" Invalid input: Duration cannot be blank.")
-                continue
-
-            # 2. Reject non-numeric input
-            try:
-                duration = int(duration_input)
-            except ValueError:
-                print(" Invalid input: Duration must be a numeric whole number.")
-                continue
-
-            # 3. Reject zero and negative values
-            if duration <= 0:
-                print(" Invalid input: Duration must be greater than zero.")
-                continue
-
-            # Valid duration accepted
-            if existing_task:
-                if action == 'add':
-                    existing_task['duration'] += duration
-                    print(f" Added {duration} min to '{existing_task['name']}'. New total: {existing_task['duration']} min.")
-                elif action == 'overwrite':
-                    existing_task['duration'] = duration
-                    print(f" Updated duration for '{existing_task['name']}' to {duration} min.")
+                    print(" Invalid task number.")
             else:
-                tasks.append({"name": task_name, "duration": duration})
-            break
+                print(" Invalid input: Please enter a numeric task number.")
 
-        print()  # Empty line for better readability
+        # Option 1: Add or update a task
+        elif choice == "1":
+            task_name = input("\nEnter task name: ").strip()
+
+            if not task_name:
+                print(" Task name cannot be empty.")
+                continue
+
+            # Check for duplicate task name
+            existing_task = next((t for t in tasks if t["name"].lower() == task_name.lower()), None)
+            action = None
+            if existing_task:
+                print(f" Task '{existing_task['name']}' already exists (Current duration: {existing_task['duration']} min).")
+                while True:
+                    act_choice = input(" Choose action - [a]dd time, [o]verwrite duration, or [c]ancel: ").strip().lower()
+                    if act_choice in ['a', 'add']:
+                        action = 'add'
+                        break
+                    elif act_choice in ['o', 'overwrite']:
+                        action = 'overwrite'
+                        break
+                    elif act_choice in ['c', 'cancel']:
+                        action = 'cancel'
+                        break
+                    else:
+                        print("  Invalid choice. Please enter 'a' to add, 'o' to overwrite, or 'c' to cancel.")
+                
+                if action == 'cancel':
+                    print(" Entry cancelled.")
+                    continue
+
+            # Prompt for positive whole-number minutes with validation
+            while True:
+                duration_input = input(f"Enter duration for '{task_name}' (in minutes): ").strip()
+
+                # 1. Reject blank / empty input
+                if not duration_input:
+                    print(" Invalid input: Duration cannot be blank.")
+                    continue
+
+                # 2. Reject non-numeric input
+                try:
+                    duration = int(duration_input)
+                except ValueError:
+                    print(" Invalid input: Duration must be a numeric whole number.")
+                    continue
+
+                # 3. Reject zero and negative values
+                if duration <= 0:
+                    print(" Invalid input: Duration must be greater than zero.")
+                    continue
+
+                # Valid duration accepted
+                if existing_task:
+                    if action == 'add':
+                        existing_task['duration'] += duration
+                        print(f" Added {duration} min to '{existing_task['name']}'. New total: {existing_task['duration']} min.")
+                    elif action == 'overwrite':
+                        existing_task['duration'] = duration
+                        print(f" Updated duration for '{existing_task['name']}' to {duration} min.")
+                else:
+                    tasks.append({"name": task_name, "duration": duration})
+                break
+
+        else:
+            print(" Invalid option. Please enter 1, 2, or 3.")
 
     # Display results
     if not tasks:
