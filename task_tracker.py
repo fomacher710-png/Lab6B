@@ -54,6 +54,13 @@ def main():
     print("\n" + "=" * 30)
     print("SUMMARY")
     print("=" * 30)
+    
+    # Improvement 2: Itemized task breakdown
+    print("Tasks Entered:")
+    for index, task in enumerate(tasks, start=1):
+        print(f"  {index}. {task['name']}: {task['duration']} minute(s)")
+    
+    print("-" * 30)
     print(f"Total time spent: {total_minutes} minute(s)")
     print(f"Longest task: {longest_task['name']} ({longest_task['duration']} minute(s))")
 
