@@ -13,6 +13,29 @@ def main():
         if not task_name:
             break
 
+        # Check for duplicate task name
+        existing_task = next((t for t in tasks if t["name"].lower() == task_name.lower()), None)
+        action = None
+        if existing_task:
+            print(f" Task '{existing_task['name']}' already exists (Current duration: {existing_task['duration']} min).")
+            while True:
+                choice = input(" Choose action - [a]dd time, [o]verwrite duration, or [c]ancel: ").strip().lower()
+                if choice in ['a', 'add']:
+                    action = 'add'
+                    break
+                elif choice in ['o', 'overwrite']:
+                    action = 'overwrite'
+                    break
+                elif choice in ['c', 'cancel']:
+                    action = 'cancel'
+                    break
+                else:
+                    print("  Invalid choice. Please enter 'a' to add, 'o' to overwrite, or 'c' to cancel.")
+            
+            if action == 'cancel':
+                print(" Entry cancelled.\n")
+                continue
+
         # Prompt for positive whole-number minutes with validation
         while True:
             duration_input = input(f"Enter duration for '{task_name}' (in minutes): ").strip()
@@ -35,7 +58,15 @@ def main():
                 continue
 
             # Valid duration accepted
-            tasks.append({"name": task_name, "duration": duration})
+            if existing_task:
+                if action == 'add':
+                    existing_task['duration'] += duration
+                    print(f" Added {duration} min to '{existing_task['name']}'. New total: {existing_task['duration']} min.")
+                elif action == 'overwrite':
+                    existing_task['duration'] = duration
+                    print(f" Updated duration for '{existing_task['name']}' to {duration} min.")
+            else:
+                tasks.append({"name": task_name, "duration": duration})
             break
 
         print()  # Empty line for better readability
@@ -55,7 +86,7 @@ def main():
     print("SUMMARY")
     print("=" * 30)
     
-    # Improvement 2: Itemized task breakdown
+    # Itemized task breakdown
     print("Tasks Entered:")
     for index, task in enumerate(tasks, start=1):
         print(f"  {index}. {task['name']}: {task['duration']} minute(s)")
